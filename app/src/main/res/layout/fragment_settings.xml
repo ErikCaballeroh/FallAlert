@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/settings_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Configuracion"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:textColor="@color/colorPrimaryDark" />
+
+    <TextView
+        android:id="@+id/settings_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Desde aqui se selecciona dispositivo, se abre Bluetooth del sistema y se revisan logs de terminal."
+        android:textSize="14sp" />
+
+    <Button
+        android:id="@+id/btn_open_system_bluetooth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Abrir Bluetooth del sistema" />
+
+    <Button
+        android:id="@+id/btn_select_device"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Seleccionar dispositivo para FallAlert" />
+
+    <Button
+        android:id="@+id/btn_connect_device"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Conectar dispositivo guardado" />
+
+    <Button
+        android:id="@+id/btn_set_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Asignar numero de telefono" />
+
+    <Button
+        android:id="@+id/btn_open_logs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Ver logs (terminal)" />
+
+</LinearLayout>

@@ -11,6 +11,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Build;
@@ -388,10 +389,10 @@ public class DevicesFragment extends ListFragment {
             refreshConnectedDevices();
             return;
         }
-        Bundle args = new Bundle();
-        args.putString("device", device.getDevice().getAddress());
-        Fragment fragment = new TerminalFragment();
-        fragment.setArguments(args);
-        getFragmentManager().beginTransaction().replace(R.id.fragment, fragment, "terminal").addToBackStack(null).commit();
+
+        SharedPreferences preferences = requireActivity().getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE);
+        preferences.edit().putString(MainActivity.PREF_DEVICE_ADDRESS, device.getDevice().getAddress()).apply();
+        Toast.makeText(getActivity(), "Dispositivo guardado para FallAlert", Toast.LENGTH_SHORT).show();
+        requireActivity().getSupportFragmentManager().popBackStack();
     }
 }

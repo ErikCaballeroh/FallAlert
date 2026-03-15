@@ -38,6 +38,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     private enum Connected { False, Pending, True }
 
     private String deviceAddress;
+    private boolean autoConnect;
     private SerialService service;
 
     private TextView receiveText;
@@ -58,7 +59,9 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         setRetainInstance(true);
-        deviceAddress = getArguments().getString("device");
+        Bundle args = getArguments();
+        deviceAddress = args != null ? args.getString("device") : null;
+        autoConnect = args != null && args.getBoolean("autoConnect", true);
     }
 
     @Override
@@ -99,9 +102,12 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     @Override
     public void onResume() {
         super.onResume();
-        if(initialStart && service != null) {
+        if(initialStart && service != null && autoConnect) {
             initialStart = false;
             getActivity().runOnUiThread(this::connect);
+        } else if (initialStart) {
+            initialStart = false;
+            status("logs mode enabled");
         }
     }
 
@@ -109,9 +115,12 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
     public void onServiceConnected(ComponentName name, IBinder binder) {
         service = ((SerialService.SerialBinder) binder).getService();
         service.attach(this);
-        if(initialStart && isResumed()) {
+        if(initialStart && isResumed() && autoConnect) {
             initialStart = false;
             getActivity().runOnUiThread(this::connect);
+        } else if (initialStart && isResumed()) {
+            initialStart = false;
+            status("logs mode enabled");
         }
     }
 
@@ -200,6 +209,10 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
      */
     private void connect() {
         try {
+            if (deviceAddress == null || deviceAddress.isEmpty()) {
+                status("device not configured");
+                return;
+            }
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             BluetoothDevice device = bluetoothAdapter.getRemoteDevice(deviceAddress);
             status("connecting...");

@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
@@ -116,6 +117,15 @@ public class SerialService extends Service implements SerialListener {
         if(!connected)
             throw new IOException("not connected");
         socket.write(data);
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void enableBackgroundMode() {
+        initNotification();
+        createNotification();
     }
 
     public void attach(SerialListener listener) {
@@ -305,6 +315,13 @@ public class SerialService extends Service implements SerialListener {
         httpExecutor.execute(() -> {
             HttpURLConnection connection = null;
             try {
+                SharedPreferences preferences = getSharedPreferences(MainActivity.PREFS_NAME, MODE_PRIVATE);
+                String phoneNumber = preferences.getString(MainActivity.PREF_PHONE_NUMBER, "");
+                String messageWithPhone = message;
+                if (phoneNumber != null && phoneNumber.matches("\\d{10}")) {
+                    messageWithPhone = message + " | phone:" + phoneNumber;
+                }
+
                 URL url = new URL(MESSAGE_API_URL);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
@@ -314,7 +331,7 @@ public class SerialService extends Service implements SerialListener {
                 connection.setDoOutput(true);
 
                 JSONObject payload = new JSONObject();
-                payload.put("message", message);
+                payload.put("message", messageWithPhone);
                 byte[] body = payload.toString().getBytes(StandardCharsets.UTF_8);
 
                 try (OutputStream outputStream = connection.getOutputStream()) {
