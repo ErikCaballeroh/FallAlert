@@ -17,8 +17,17 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * create notification and queue serial data while activity is not in the foreground
@@ -49,10 +58,14 @@ public class SerialService extends Service implements SerialListener {
     private final IBinder binder;
     private final ArrayDeque<QueueItem> queue1, queue2;
     private final QueueItem lastRead;
+    private final ExecutorService httpExecutor;
+    private final StringBuilder incomingLineBuffer;
 
     private SerialSocket socket;
     private SerialListener listener;
     private boolean connected;
+
+    private static final String MESSAGE_API_URL = "http://192.168.1.65:3000/api/message";
 
     /**
      * Lifecylce
@@ -63,12 +76,15 @@ public class SerialService extends Service implements SerialListener {
         queue1 = new ArrayDeque<>();
         queue2 = new ArrayDeque<>();
         lastRead = new QueueItem(QueueType.Read);
+        httpExecutor = Executors.newSingleThreadExecutor();
+        incomingLineBuffer = new StringBuilder();
     }
 
     @Override
     public void onDestroy() {
         cancelNotification();
         disconnect();
+        httpExecutor.shutdownNow();
         super.onDestroy();
     }
 
@@ -238,6 +254,7 @@ public class SerialService extends Service implements SerialListener {
      * While not consumed (2), add more data (3).
      */
     public void onSerialRead(byte[] data) {
+        handleIncomingForApi(data);
         if(connected) {
             synchronized (this) {
                 if (listener != null) {
@@ -267,6 +284,52 @@ public class SerialService extends Service implements SerialListener {
                 }
             }
         }
+    }
+
+    private void handleIncomingForApi(byte[] data) {
+        String chunk = new String(data, StandardCharsets.UTF_8);
+        synchronized (incomingLineBuffer) {
+            incomingLineBuffer.append(chunk);
+            int newlineIndex;
+            while ((newlineIndex = incomingLineBuffer.indexOf("\n")) != -1) {
+                String message = incomingLineBuffer.substring(0, newlineIndex).replace("\r", "").trim();
+                incomingLineBuffer.delete(0, newlineIndex + 1);
+                if (!message.isEmpty()) {
+                    sendMessageToApi(message);
+                }
+            }
+        }
+    }
+
+    private void sendMessageToApi(String message) {
+        httpExecutor.execute(() -> {
+            HttpURLConnection connection = null;
+            try {
+                URL url = new URL(MESSAGE_API_URL);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setConnectTimeout(5000);
+                connection.setReadTimeout(5000);
+                connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                connection.setDoOutput(true);
+
+                JSONObject payload = new JSONObject();
+                payload.put("message", message);
+                byte[] body = payload.toString().getBytes(StandardCharsets.UTF_8);
+
+                try (OutputStream outputStream = connection.getOutputStream()) {
+                    outputStream.write(body);
+                }
+
+                connection.getResponseCode();
+            } catch (Exception ignored) {
+                // Keep service resilient in background; transient API/network errors are ignored.
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+        });
     }
 
     public void onSerialIoError(Exception e) {
