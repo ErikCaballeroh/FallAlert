@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.text.InputFilter;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +32,7 @@ public class SettingsFragment extends Fragment {
 
         Button selectDeviceButton = view.findViewById(R.id.btn_select_device);
         Button connectDeviceButton = view.findViewById(R.id.btn_connect_device);
-        Button setPhoneButton = view.findViewById(R.id.btn_set_phone);
+        Button setChatIdButton = view.findViewById(R.id.btn_set_chat_id);
         Button openSystemBluetoothButton = view.findViewById(R.id.btn_open_system_bluetooth);
         Button openLogsButton = view.findViewById(R.id.btn_open_logs);
 
@@ -49,7 +48,7 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        setPhoneButton.setOnClickListener(v -> showPhoneDialog());
+        setChatIdButton.setOnClickListener(v -> showChatIdDialog());
 
         openSystemBluetoothButton.setOnClickListener(v -> {
             Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
@@ -63,34 +62,36 @@ public class SettingsFragment extends Fragment {
         });
     }
 
-    private void showPhoneDialog() {
+    private void showChatIdDialog() {
         if (getActivity() == null) {
             return;
         }
 
         SharedPreferences preferences = requireActivity().getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE);
-        String currentPhone = preferences.getString(MainActivity.PREF_PHONE_NUMBER, "");
+        String currentChatId = preferences.getString(MainActivity.PREF_CHAT_ID, "");
 
         EditText input = new EditText(getActivity());
-        input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(10)});
-        input.setHint("Ej: 3001234567");
-        input.setText(currentPhone);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+        input.setHint("Ej: -1001234567890");
+        input.setText(currentChatId);
 
         new AlertDialog.Builder(getActivity())
-                .setTitle("Numero de emergencia")
-                .setMessage("Ingresa un numero de 10 digitos")
+                .setTitle("Chat ID de Telegram")
+                .setMessage("Ingresa el Chat ID del grupo o canal donde el bot enviara alertas.")
                 .setView(input)
                 .setPositiveButton("Guardar", (dialog, which) -> {
-                    String phone = input.getText().toString().trim();
-                    if (!phone.matches("\\d{10}")) {
-                        Toast.makeText(getActivity(), "Debe tener exactamente 10 digitos", Toast.LENGTH_LONG).show();
+                    String chatId = input.getText().toString().trim();
+                    try {
+                        Long.parseLong(chatId);
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(getActivity(), "Chat ID invalido", Toast.LENGTH_LONG).show();
                         return;
                     }
-                    preferences.edit().putString(MainActivity.PREF_PHONE_NUMBER, phone).apply();
-                    Toast.makeText(getActivity(), "Numero guardado", Toast.LENGTH_SHORT).show();
+                    preferences.edit().putString(MainActivity.PREF_CHAT_ID, chatId).apply();
+                    Toast.makeText(getActivity(), "Chat ID guardado", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancelar", null)
                 .show();
     }
+
 }

@@ -18,10 +18,13 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
+import java.io.BufferedReader;
 import java.io.OutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -66,8 +69,8 @@ public class SerialService extends Service implements SerialListener {
     private SerialListener listener;
     private boolean connected;
 
-    private static final String MESSAGE_API_URL = "http://192.168.1.65:3000/api/message";
-
+    private static final String TELEGRAM_BOT_URL = "https://api.telegram.org/bot" + BuildConfig.TELEGRAM_BOT_TOKEN + "/sendMessage";
+    private static final long TELEGRAM_CHAT_ID = -1003837190435L;
     /**
      * Lifecylce
      */
@@ -315,14 +318,7 @@ public class SerialService extends Service implements SerialListener {
         httpExecutor.execute(() -> {
             HttpURLConnection connection = null;
             try {
-                SharedPreferences preferences = getSharedPreferences(MainActivity.PREFS_NAME, MODE_PRIVATE);
-                String phoneNumber = preferences.getString(MainActivity.PREF_PHONE_NUMBER, "");
-                String messageWithPhone = message;
-                if (phoneNumber != null && phoneNumber.matches("\\d{10}")) {
-                    messageWithPhone = message + " | phone:" + phoneNumber;
-                }
-
-                URL url = new URL(MESSAGE_API_URL);
+                URL url = new URL(TELEGRAM_BOT_URL);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setConnectTimeout(5000);
@@ -330,23 +326,100 @@ public class SerialService extends Service implements SerialListener {
                 connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 connection.setDoOutput(true);
 
+                String formattedText =
+                        "\uD83D\uDEA8 <b>¡ALERTA DE CAÍDA DETECTADA!</b> \uD83D\uDEA8\n\n" +
+                        "\uD83D\uDCF1 Señal recibida: <code>" + message + "</code>\n\n" +
+                        "⚠️ Se requiere atención inmediata.\n" +
+                        "\uD83D\uDD14 Por favor responde a la brevedad.";
+
+                SharedPreferences preferences = getSharedPreferences(MainActivity.PREFS_NAME, MODE_PRIVATE);
+                String savedChatId = preferences.getString(MainActivity.PREF_CHAT_ID, "");
+                long chatId = TELEGRAM_CHAT_ID;
+                if (savedChatId != null && !savedChatId.isEmpty()) {
+                    try {
+                        chatId = Long.parseLong(savedChatId);
+                    } catch (NumberFormatException ignored) {}
+                }
+
                 JSONObject payload = new JSONObject();
-                payload.put("message", messageWithPhone);
+                payload.put("chat_id", chatId);
+                payload.put("text", formattedText);
+                payload.put("parse_mode", "HTML");
+
                 byte[] body = payload.toString().getBytes(StandardCharsets.UTF_8);
 
                 try (OutputStream outputStream = connection.getOutputStream()) {
                     outputStream.write(body);
                 }
 
-                connection.getResponseCode();
-            } catch (Exception ignored) {
-                // Keep service resilient in background; transient API/network errors are ignored.
+                int responseCode = connection.getResponseCode();
+                String responseBody = readResponseBody(connection, responseCode);
+                if (responseCode >= 200 && responseCode < 300) {
+                    appendHttpLog("OK " + responseCode + " -> " + truncate(responseBody, 220));
+                } else {
+                    appendHttpLog("ERROR " + responseCode + " -> " + truncate(responseBody, 220));
+                }
+            } catch (Exception e) {
+                appendHttpLog("EXCEPCION -> " + e.getClass().getSimpleName() + ": " + e.getMessage());
             } finally {
                 if (connection != null) {
                     connection.disconnect();
                 }
             }
         });
+    }
+
+    private void appendHttpLog(String text) {
+        byte[] data = ("[HTTP] " + text + "\n").getBytes(StandardCharsets.UTF_8);
+        synchronized (this) {
+            if (listener != null) {
+                mainLooper.post(() -> {
+                    if (listener != null) {
+                        ArrayDeque<byte[]> datas = new ArrayDeque<>();
+                        datas.add(data);
+                        listener.onSerialRead(datas);
+                    } else {
+                        queue1.add(new QueueItem(QueueType.Read));
+                        queue1.getLast().add(data);
+                    }
+                });
+            } else {
+                if (queue2.isEmpty() || queue2.getLast().type != QueueType.Read) {
+                    queue2.add(new QueueItem(QueueType.Read));
+                }
+                queue2.getLast().add(data);
+            }
+        }
+    }
+
+    private String readResponseBody(HttpURLConnection connection, int responseCode) {
+        InputStream stream = null;
+        try {
+            stream = responseCode >= 200 && responseCode < 400 ? connection.getInputStream() : connection.getErrorStream();
+            if (stream == null) {
+                return "<sin body>";
+            }
+            StringBuilder sb = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+            }
+            return sb.length() == 0 ? "<body vacio>" : sb.toString();
+        } catch (Exception e) {
+            return "<no se pudo leer body: " + e.getMessage() + ">";
+        }
+    }
+
+    private String truncate(String value, int maxLen) {
+        if (value == null) {
+            return "";
+        }
+        if (value.length() <= maxLen) {
+            return value;
+        }
+        return value.substring(0, maxLen) + "...";
     }
 
     public void onSerialIoError(Exception e) {

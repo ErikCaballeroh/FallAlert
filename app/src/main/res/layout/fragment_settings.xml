@@ -19,14 +19,50 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Desde aqui se selecciona dispositivo, se abre Bluetooth del sistema y se revisan logs de terminal."
+        android:text="Configura el dispositivo Bluetooth y el destino de las alertas de Telegram."
         android:textSize="14sp" />
+
+    <!-- Instrucciones Telegram -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="📋 Configuracion de Telegram"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textColor="@color/colorPrimaryDark" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="#F0F4FF"
+        android:padding="12dp"
+        android:text="1. Agrega el bot al grupo o canal donde quieres recibir alertas:\n   @arduino_detector_caidas_bot\n\n2. Obtén el Chat ID de tu grupo o canal:\n   - Abre @Getmyid_Work_Bot en Telegram\n   - Escribe /start\n   - Reenvía (forward) un mensaje del grupo al bot\n   - El bot te dará el Chat ID (puede empezar con -)\n\n3. Ingresa ese Chat ID abajo."
+        android:textSize="13sp" />
+
+    <Button
+        android:id="@+id/btn_set_chat_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Asignar Chat ID de Telegram" />
+
+    <!-- Bluetooth -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="📡 Configuracion de Bluetooth"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textColor="@color/colorPrimaryDark" />
 
     <Button
         android:id="@+id/btn_open_system_bluetooth"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="8dp"
         android:text="Abrir Bluetooth del sistema" />
 
     <Button
@@ -44,17 +80,10 @@
         android:text="Conectar dispositivo guardado" />
 
     <Button
-        android:id="@+id/btn_set_phone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="Asignar numero de telefono" />
-
-    <Button
         android:id="@+id/btn_open_logs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="20dp"
         android:text="Ver logs (terminal)" />
 
 </LinearLayout>

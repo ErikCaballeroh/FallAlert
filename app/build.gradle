@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+def localProps = new Properties()
+def localPropsFile = rootProject.file('local.properties')
+if (localPropsFile.exists()) {
+    localPropsFile.withInputStream { localProps.load(it) }
+}
+
 android {
     compileSdk 34
     defaultConfig {
@@ -10,6 +16,8 @@ android {
         applicationId "de.kai_morich.simple_bluetooth_le_terminal"
         versionCode 1
         versionName "1.0"
+
+        buildConfigField "String", "TELEGRAM_BOT_TOKEN", "\"${localProps['telegram.bot.token'] ?: ''}\""
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -22,6 +30,9 @@ android {
         }
     }
     namespace 'de.kai_morich.simple_bluetooth_le_terminal'
+    buildFeatures {
+        buildConfig true
+    }
 }
 
 dependencies {

@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
     public static final String PREFS_NAME = "fallalert_prefs";
     public static final String PREF_DEVICE_ADDRESS = "selected_device_address";
-    public static final String PREF_PHONE_NUMBER = "emergency_phone_number";
+    public static final String PREF_CHAT_ID = "telegram_chat_id";
 
     private static final String TAG_HOME = "home";
     private static final String TAG_SETTINGS = "settings";
