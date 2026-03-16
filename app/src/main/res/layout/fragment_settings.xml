@@ -1,89 +1,173 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="20dp">
+    android:background="@color/colorSurface">
 
-    <TextView
-        android:id="@+id/settings_title"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Configuracion"
-        android:textStyle="bold"
-        android:textSize="24sp"
-        android:textColor="@color/colorPrimaryDark" />
+        android:orientation="vertical"
+        android:padding="20dp">
 
-    <TextView
-        android:id="@+id/settings_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Configura el dispositivo Bluetooth y el destino de las alertas de Telegram."
-        android:textSize="14sp" />
+        <TextView
+            android:id="@+id/settings_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Configuracion"
+            android:textStyle="bold"
+            android:textSize="24sp"
+            android:textColor="@color/colorSectionHeader" />
 
-    <!-- Instrucciones Telegram -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="📋 Configuracion de Telegram"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:textColor="@color/colorPrimaryDark" />
+        <TextView
+            android:id="@+id/settings_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Configura el dispositivo Bluetooth y el destino de las alertas de Telegram."
+            android:textSize="14sp"
+            android:textColor="@color/colorTextSecondary"
+            android:lineSpacingMultiplier="1.3" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="#F0F4FF"
-        android:padding="12dp"
-        android:text="1. Agrega el bot al grupo o canal donde quieres recibir alertas:\n   @arduino_detector_caidas_bot\n\n2. Obtén el Chat ID de tu grupo o canal:\n   - Abre @Getmyid_Work_Bot en Telegram\n   - Escribe /start\n   - Reenvía (forward) un mensaje del grupo al bot\n   - El bot te dará el Chat ID (puede empezar con -)\n\n3. Ingresa ese Chat ID abajo."
-        android:textSize="13sp" />
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/colorDivider" />
 
-    <Button
-        android:id="@+id/btn_set_chat_id"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="Asignar Chat ID de Telegram" />
+        <!-- Seccion Telegram -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="&#x1F4CB; Configuracion de Telegram"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/colorSectionHeader" />
 
-    <!-- Bluetooth -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="📡 Configuracion de Bluetooth"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:textColor="@color/colorPrimaryDark" />
+        <!-- Instruction box -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorInstructionBg"
+            android:padding="14dp">
 
-    <Button
-        android:id="@+id/btn_open_system_bluetooth"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Abrir Bluetooth del sistema" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Paso 1 — Agrega el bot a tu grupo o canal:"
+                android:textStyle="bold"
+                android:textColor="@color/colorInstructionText"
+                android:textSize="13sp" />
 
-    <Button
-        android:id="@+id/btn_select_device"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="Seleccionar dispositivo para FallAlert" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="    @arduino_detector_caidas_bot"
+                android:textColor="@color/colorInstructionText"
+                android:textSize="13sp"
+                android:textStyle="italic" />
 
-    <Button
-        android:id="@+id/btn_connect_device"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="Conectar dispositivo guardado" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Paso 2 — Obtén el Chat ID del grupo:"
+                android:textStyle="bold"
+                android:textColor="@color/colorInstructionText"
+                android:textSize="13sp" />
 
-    <Button
-        android:id="@+id/btn_open_logs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Ver logs (terminal)" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="  1. Abre @Getmyid_Work_Bot en Telegram\n  2. Escribe /start\n  3. Reenvía un mensaje del grupo al bot\n  4. El bot te mostrará el Chat ID (puede comenzar con -)"
+                android:textColor="@color/colorInstructionText"
+                android:textSize="13sp"
+                android:lineSpacingMultiplier="1.4" />
 
-</LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Paso 3 — Ingresa el Chat ID con el botón de abajo."
+                android:textStyle="bold"
+                android:textColor="@color/colorInstructionText"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_set_chat_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColor="@color/colorWhite"
+            android:text="Asignar Chat ID de Telegram" />
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/colorDivider" />
+
+        <!-- Seccion Bluetooth -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="&#x1F4E1; Configuracion de Bluetooth"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/colorSectionHeader" />
+
+        <Button
+            android:id="@+id/btn_open_system_bluetooth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/colorTextSecondary"
+            android:textColor="@color/colorWhite"
+            android:text="Abrir Bluetooth del sistema" />
+
+        <Button
+            android:id="@+id/btn_select_device"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/colorTextSecondary"
+            android:textColor="@color/colorWhite"
+            android:text="Seleccionar dispositivo para FallAlert" />
+
+        <Button
+            android:id="@+id/btn_connect_device"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColor="@color/colorWhite"
+            android:text="Conectar dispositivo guardado" />
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/colorDivider" />
+
+        <Button
+            android:id="@+id/btn_open_logs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/colorTextSecondary"
+            android:textColor="@color/colorWhite"
+            android:text="Ver logs (terminal)" />
+
+    </LinearLayout>
+</ScrollView>

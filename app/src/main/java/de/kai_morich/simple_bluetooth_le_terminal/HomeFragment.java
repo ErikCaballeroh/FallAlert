@@ -23,9 +23,6 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        TextView status = view.findViewById(R.id.home_status);
-        status.setText("Flujo: Arduino -> Bluetooth -> App -> API SMS");
-
         Button startButton = view.findViewById(R.id.btn_start_listening);
         Button settingsButton = view.findViewById(R.id.btn_open_settings);
 

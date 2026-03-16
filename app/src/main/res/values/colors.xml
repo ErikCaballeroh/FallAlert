@@ -1,10 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#d84315</color>
-    <color name="colorPrimaryDark">#bf360c</color>
-    <color name="colorAccent">#ff6e40</color>
+    <color name="colorPrimary">#C62828</color>
+    <color name="colorPrimaryDark">#8E0000</color>
+    <color name="colorAccent">#FF5722</color>
 
-    <color name="colorRecieveText">#00FF00</color>
-    <color name="colorSendText">#82CAFF</color>
-    <color name="colorStatusText">#FFDB58</color>
+    <color name="colorRecieveText">#00E676</color>
+    <color name="colorSendText">#82B1FF</color>
+    <color name="colorStatusText">#FFD740</color>
+
+    <color name="colorTextPrimary">#1A1A1A</color>
+    <color name="colorTextSecondary">#424242</color>
+    <color name="colorHeaderBg">#B71C1C</color>
+    <color name="colorHeaderText">#FFFFFF</color>
+    <color name="colorHeaderSubtext">#FFCDD2</color>
+    <color name="colorHintBg">#FFF3E0</color>
+    <color name="colorHintTitle">#BF360C</color>
+    <color name="colorHintText">#3E2723</color>
+    <color name="colorInstructionBg">#E3F2FD</color>
+    <color name="colorInstructionText">#0D2137</color>
+    <color name="colorSectionHeader">#8E0000</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorSurface">#FAFAFA</color>
+    <color name="colorDivider">#E0E0E0</color>
 </resources>
