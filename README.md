@@ -1,63 +1,92 @@
 # FallAlert (Android)
 
-Aplicacion Android para recibir una alarma de caida enviada por un detector basado en Arduino por Bluetooth, y luego disparar una alerta remota consumiendo una API para envio de SMS.
+Aplicacion Android para recibir mensajes de alerta desde un detector basado en Arduino por Bluetooth, y disparar notificaciones remotas por Telegram.
 
-## Estado del proyecto
+## Estado actual
 
-En desarrollo.
+Flujo actual implementado:
 
-El objetivo actual es validar de punta a punta este flujo:
+1. El detector de caidas (Arduino) envia una alerta por Bluetooth.
+2. La app recibe y procesa el mensaje en segundo plano.
+3. La app envia un mensaje formateado a Telegram usando el Bot API.
+4. La app registra en logs el resultado HTTP del envio.
 
-1. El detector de caidas en Arduino identifica un evento de riesgo.
-2. Arduino envia un mensaje de alarma por Bluetooth a la app Android.
-3. La app interpreta el mensaje y activa una alerta.
-4. La app llama una API externa para enviar SMS a contactos de emergencia.
+## Funcionalidades implementadas
 
-## Caracteristicas
+- Escucha Bluetooth con servicio en segundo plano (Foreground Service).
+- Conexion manual a dispositivo guardado desde pantalla de Configuracion.
+- Envio de alertas a Telegram (`sendMessage`) con formato enriquecido (`parse_mode=HTML`).
+- Configuracion de Chat ID desde la app (almacenado en SharedPreferences).
+- Visualizacion de logs de comunicacion serial y logs HTTP.
+- UI principal adaptada a FallAlert (Home + Configuracion + Logs).
 
-- Recepcion de mensajes desde un dispositivo Bluetooth.
-- Parseo de eventos de alarma enviados por el detector de caidas.
-- Integracion con API HTTP para envio de SMS.
-- Base de codigo pensada para iterar rapido durante pruebas.
-
-## Arquitectura (resumen)
+## Arquitectura resumida
 
 - Origen de evento: detector de caidas (Arduino).
-- Transporte: Bluetooth.
-- Cliente movil: app Android (este repositorio).
-- Notificacion externa: API de mensajeria SMS.
+- Transporte: Bluetooth (app Android).
+- Servicio: SerialService (recepcion serial + envio HTTP + notificacion en background).
+- Destino remoto: Telegram Bot API.
 
 ## Requisitos
 
-- Android Studio.
-- SDK de Android compatible con este proyecto.
-- Dispositivo Android con Bluetooth habilitado.
-- Detector de caidas Arduino configurado para enviar mensajes.
-- Endpoint/API de SMS disponible para pruebas.
+- Android Studio (version reciente).
+- JDK 21 (o version compatible con tu Android Studio).
+- Gradle Wrapper 8.9 (incluido en el repositorio).
+- Android Gradle Plugin 8.5.2 (configurado en el proyecto).
+- Dispositivo Android fisico para pruebas Bluetooth.
+- Bot de Telegram y Chat ID de grupo/canal para recibir alertas.
+
+## Configuracion de Telegram
+
+1. Crea un bot con @BotFather (si aun no lo tienes).
+2. Agrega el bot al grupo/canal destino (por ejemplo: `@arduino_detector_caidas_bot`).
+3. Obtiene el Chat ID con @Getmyid_Work_Bot:
+	- enviar `/start`
+	- reenviar un mensaje del grupo/canal al bot
+	- copiar el Chat ID devuelto
+4. Dentro de la app, abre Configuracion y guarda ese Chat ID.
+
+## Seguridad de credenciales
+
+Este proyecto lee el token desde `local.properties` mediante `BuildConfig`:
+
+```properties
+telegram.bot.token=TU_TOKEN_AQUI
+```
+
+`local.properties` ya esta ignorado por Git.
 
 ## Ejecucion local
 
 1. Clona este repositorio.
 2. Abre el proyecto en Android Studio.
-3. Sincroniza Gradle.
-4. Ejecuta la app en un dispositivo fisico Android (recomendado para Bluetooth).
-5. Empareja o conecta con el modulo Bluetooth del detector.
-6. Simula una caida y verifica que se reciba la alarma y se dispare la llamada a la API de SMS.
+3. Agrega `telegram.bot.token` en `local.properties`.
+4. Sincroniza Gradle.
+5. Ejecuta la app en un dispositivo fisico Android.
+6. Configura Chat ID en la pantalla de Configuracion.
+7. Selecciona y conecta el dispositivo Bluetooth guardado.
+8. Inicia la escucha en segundo plano y valida que la alerta llegue a Telegram.
+
+## Notas de uso
+
+- La app no fuerza conexion al abrirse; la conexion se inicia desde Configuracion.
+- Si no hay Chat ID guardado, se usa un Chat ID por defecto definido en codigo.
+- Los resultados de envio HTTP aparecen en la vista de logs.
 
 ## Roadmap corto
 
-- Mejorar validacion de mensajes recibidos desde Arduino.
-- Robustecer reintentos y manejo de errores al llamar la API SMS.
-- Agregar logs y trazabilidad de eventos de alarma.
-- Definir pruebas de integracion para flujo Bluetooth + API.
+- Mejorar validacion y normalizacion de mensajes entrantes desde Arduino.
+- Agregar politicas de reintento/backoff para errores de red.
+- Separar configuraciones por entorno (dev/test/prod).
+- Agregar pruebas instrumentadas para flujo Bluetooth + Telegram.
 
 ## Creditos
 
-Este proyecto toma como base el repositorio:
+Este proyecto toma como base:
 
 - [kai-morich/SimpleBluetoothLeTerminal](https://github.com/kai-morich/SimpleBluetoothLeTerminal)
 
-Gracias a [Kai Morich](https://github.com/kai-morich) por el trabajo original y por publicar una base clara para comunicacion Bluetooth en Android.
+Gracias a [Kai Morich](https://github.com/kai-morich) por el trabajo original.
 
 ## Proyecto derivado y atribucion
 
@@ -67,7 +96,7 @@ Este proyecto es un trabajo derivado de SimpleBluetoothLeTerminal.
 - Autor original del codigo base: Kai Morich
 - Licencia del codigo base: MIT
 
-De acuerdo con la licencia MIT, se conserva el aviso de copyright y el texto de licencia en este repositorio.
+Se conserva el aviso de copyright y la licencia MIT en este repositorio.
 
 ## Licencia
 
